@@ -303,4 +303,3 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
-
