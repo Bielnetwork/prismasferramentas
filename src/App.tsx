@@ -72,116 +72,27 @@ function appendCampaignParams(target: string) {
 }
 
 function Carousel({ onOpen, previewOpen }: { onOpen: (index: number) => void; previewOpen: boolean }) {
-  const total = slides.length
-  const [index, setIndex] = useState(total)
-  const [animated, setAnimated] = useState(true)
-  const [inView, setInView] = useState(false)
-  const [hovered, setHovered] = useState(false)
-  const [keyboardFocused, setKeyboardFocused] = useState(false)
-  const [interactionPaused, setInteractionPaused] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const shellRef = useRef<HTMLDivElement>(null)
-  const pointerStart = useRef<number | null>(null)
-  const didSwipe = useRef(false)
-  const resumeTimer = useRef<number | null>(null)
-  const tripled = [...slides, ...slides, ...slides]
-  const paused = !inView || hovered || keyboardFocused || interactionPaused || previewOpen || reducedMotion
-
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(query.matches)
-    update()
-    query.addEventListener('change', update)
-    return () => query.removeEventListener('change', update)
-  }, [])
-
-  useEffect(() => {
-    const shell = shellRef.current
-    if (!shell) return
-    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.2, rootMargin: '80px 0px' })
-    observer.observe(shell)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (paused) return
-    const timer = window.setInterval(() => setIndex((value) => value + 1), 2800)
-    return () => window.clearInterval(timer)
-  }, [paused])
-
-  useEffect(() => () => {
-    if (resumeTimer.current !== null) window.clearTimeout(resumeTimer.current)
-  }, [])
-
-  function normalize() {
-    if (index >= total * 2) {
-      setAnimated(false)
-      setIndex(index - total)
-      requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)))
-    } else if (index < total) {
-      setAnimated(false)
-      setIndex(index + total)
-      requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)))
-    }
-  }
-
-  function pauseTemporarily() {
-    setInteractionPaused(true)
-    if (resumeTimer.current !== null) window.clearTimeout(resumeTimer.current)
-    resumeTimer.current = window.setTimeout(() => {
-      setInteractionPaused(false)
-      resumeTimer.current = null
-    }, 3600)
-  }
-
-  function move(direction: number) {
-    pauseTemporarily()
-    setIndex((value) => value + direction)
-  }
-
-  function openSlide(slideIndex: number) {
-    if (didSwipe.current) return
-    onOpen(slideIndex % total)
-  }
-
   return (
-    <div
-      ref={shellRef}
-      className="carousel-shell"
-      onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHovered(true) }}
-      onPointerLeave={(event) => { if (event.pointerType === 'mouse') setHovered(false) }}
-      onFocusCapture={(event) => { if ((event.target as HTMLElement).matches(':focus-visible')) setKeyboardFocused(true) }}
-      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setKeyboardFocused(false) }}
-    >
-      <div
-        className="carousel-viewport"
-        onPointerDown={(event) => { pointerStart.current = event.clientX; didSwipe.current = false }}
-        onPointerCancel={() => { pointerStart.current = null; didSwipe.current = false }}
-        onPointerUp={(event) => {
-          if (pointerStart.current === null) return
-          const distance = event.clientX - pointerStart.current
-          pointerStart.current = null
-          if (Math.abs(distance) > 42) {
-            didSwipe.current = true
-            move(distance > 0 ? -1 : 1)
-            window.setTimeout(() => { didSwipe.current = false }, 0)
-          }
-        }}
-      >
-        <div className="carousel-track" style={{ transform: `translate3d(calc(${index} * var(--slide-step) * -1), 0, 0)`, transition: animated ? 'transform 680ms cubic-bezier(.22,.72,.25,1)' : 'none' }} onTransitionEnd={normalize}>
-          {tripled.map((slide, i) => (
-            <button className={`demo-slide tone-${slide.tone}`} type="button" key={`${slide.title}-${i}`} onClick={() => openSlide(i)} aria-label={`Ampliar exemplo: ${slide.title}`}>
-              {slide.image ? <img src={slide.image} alt={`Exemplo do material ${slide.title}`} loading="lazy" /> : <div className="slide-placeholder"><span className="slide-number">{String((i % total) + 1).padStart(2, '0')}</span><div><small>MAPA VISUAL</small><h3>{slide.title}</h3><p>{slide.label}</p></div><span className="expand-label">Ampliar <span aria-hidden="true">↗</span></span></div>}
-            </button>
+    <div className={`carousel-shell ${previewOpen ? 'is-paused' : ''}`}>
+      <div className="carousel-viewport">
+        <div className="carousel-track">
+          {[0, 1].map((setIndex) => (
+            <div className="carousel-set" key={setIndex} aria-hidden={setIndex === 1 ? 'true' : undefined}>
+              {slides.map((slide, slideIndex) => (
+                <button
+                  className={`demo-slide tone-${slide.tone}`}
+                  type="button"
+                  key={`${slide.title}-${setIndex}`}
+                  onClick={() => onOpen(slideIndex)}
+                  tabIndex={setIndex === 1 ? -1 : 0}
+                  aria-label={`Ampliar exemplo: ${slide.title}`}
+                >
+                  {slide.image ? <img src={slide.image} alt={`Exemplo do material ${slide.title}`} loading="lazy" /> : <div className="slide-placeholder"><span className="slide-number">{String(slideIndex + 1).padStart(2, '0')}</span><div><small>MAPA VISUAL</small><h3>{slide.title}</h3><p>{slide.label}</p></div><span className="expand-label">Ampliar <span aria-hidden="true">↗</span></span></div>}
+                </button>
+              ))}
+            </div>
           ))}
         </div>
-      </div>
-      <div className="carousel-controls">
-        <div className="arrow-group">
-          <button className="icon-button" type="button" onClick={() => move(-1)} aria-label="Exemplo anterior">←</button>
-          <button className="icon-button" type="button" onClick={() => move(1)} aria-label="Próximo exemplo">→</button>
-        </div>
-        <span className="carousel-status">{String((index % total) + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
     </div>
   )
@@ -340,7 +251,7 @@ function App() {
           <div className="section-heading"><span className="eyebrow">ESCOLHA SEU PACOTE</span><h2>Escolha como você quer acessar sua biblioteca de gestão.</h2><p>Pagamento único. Material digital em PDF.</p></div>
           <div className="offer-grid">
             <article className="offer-card basic"><ImageSlot src={imageConfig.basicPackage} label="IMAGEM DO PACOTE BÁSICO" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE BÁSICO</span><h3>PRISMA Essencial — 100 Mapas</h3><p className="plan-support">Para quem quer estudar e consultar os 100 mapas visuais de gestão.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.basic}</strong></div><ul><li><Icon name="check" /> 100 mapas visuais.</li><li><Icon name="check" /> 6 módulos completos.</li><li><Icon name="check" /> Explicações e exemplos práticos.</li><li><Icon name="check" /> PDF para consulta no celular e impressão.</li><li className="not-included"><Icon name="x" /> Não inclui os três bônus.</li></ul><button className="button button-outline" onClick={openBasicOffer}>QUERO OS 100 MAPAS</button></div></article>
-            <article className="offer-card premium"><span className="premium-ribbon">MAIS CONTEÚDO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => { trackEvent('ClickPremium'); checkout(siteConfig.checkouts.checkoutPremium, 'Premium') }}>QUERO O PRISMA COMPLETO</button></div></article>
+            <article className="offer-card premium"><span className="premium-ribbon">MAIS VENDIDO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><p className="premium-value-highlight">100 mapas visuais + 3 bônus exclusivos</p><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => { trackEvent('ClickPremium'); checkout(siteConfig.checkouts.checkoutPremium, 'Premium') }}>QUERO O PRISMA COMPLETO</button></div></article>
           </div>
           <p className="secure-note"><span aria-hidden="true">◇</span> Os links de checkout serão conectados antes da publicação. Nenhuma cobrança ocorre nesta versão local.</p>
         </section>
