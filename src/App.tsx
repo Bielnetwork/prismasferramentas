@@ -71,17 +71,21 @@ function appendCampaignParams(target: string) {
   return destination.toString()
 }
 
-function Carousel({ onOpen }: { onOpen: (index: number) => void }) {
+function Carousel({ onOpen, previewOpen }: { onOpen: (index: number) => void; previewOpen: boolean }) {
   const total = slides.length
   const [index, setIndex] = useState(total)
   const [animated, setAnimated] = useState(true)
+  const [inView, setInView] = useState(false)
   const [hovered, setHovered] = useState(false)
-  const [focused, setFocused] = useState(false)
-  const [manualPause, setManualPause] = useState(false)
+  const [keyboardFocused, setKeyboardFocused] = useState(false)
+  const [interactionPaused, setInteractionPaused] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const shellRef = useRef<HTMLDivElement>(null)
   const pointerStart = useRef<number | null>(null)
+  const didSwipe = useRef(false)
+  const resumeTimer = useRef<number | null>(null)
   const tripled = [...slides, ...slides, ...slides]
-  const paused = hovered || focused || manualPause || reducedMotion
+  const paused = !inView || hovered || keyboardFocused || interactionPaused || previewOpen || reducedMotion
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -92,10 +96,22 @@ function Carousel({ onOpen }: { onOpen: (index: number) => void }) {
   }, [])
 
   useEffect(() => {
+    const shell = shellRef.current
+    if (!shell) return
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.2, rootMargin: '80px 0px' })
+    observer.observe(shell)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     if (paused) return
-    const timer = window.setInterval(() => setIndex((value) => value + 1), 3200)
+    const timer = window.setInterval(() => setIndex((value) => value + 1), 2800)
     return () => window.clearInterval(timer)
   }, [paused])
+
+  useEffect(() => () => {
+    if (resumeTimer.current !== null) window.clearTimeout(resumeTimer.current)
+  }, [])
 
   function normalize() {
     if (index >= total * 2) {
@@ -109,20 +125,50 @@ function Carousel({ onOpen }: { onOpen: (index: number) => void }) {
     }
   }
 
+  function pauseTemporarily() {
+    setInteractionPaused(true)
+    if (resumeTimer.current !== null) window.clearTimeout(resumeTimer.current)
+    resumeTimer.current = window.setTimeout(() => {
+      setInteractionPaused(false)
+      resumeTimer.current = null
+    }, 3600)
+  }
+
   function move(direction: number) {
-    setManualPause(true)
+    pauseTemporarily()
     setIndex((value) => value + direction)
   }
 
   function openSlide(slideIndex: number) {
-    setManualPause(true)
+    if (didSwipe.current) return
     onOpen(slideIndex % total)
   }
 
   return (
-    <div className="carousel-shell" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setFocused(false) }}>
-      <div className="carousel-viewport" onPointerDown={(e) => { pointerStart.current = e.clientX }} onPointerUp={(e) => { if (pointerStart.current === null) return; const distance = e.clientX - pointerStart.current; if (Math.abs(distance) > 42) move(distance > 0 ? -1 : 1); pointerStart.current = null }}>
-        <div className="carousel-track" style={{ transform: `translate3d(calc(${index} * var(--slide-step) * -1), 0, 0)`, transition: animated ? 'transform 520ms cubic-bezier(.22,.72,.25,1)' : 'none' }} onTransitionEnd={normalize}>
+    <div
+      ref={shellRef}
+      className="carousel-shell"
+      onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHovered(true) }}
+      onPointerLeave={(event) => { if (event.pointerType === 'mouse') setHovered(false) }}
+      onFocusCapture={(event) => { if ((event.target as HTMLElement).matches(':focus-visible')) setKeyboardFocused(true) }}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setKeyboardFocused(false) }}
+    >
+      <div
+        className="carousel-viewport"
+        onPointerDown={(event) => { pointerStart.current = event.clientX; didSwipe.current = false }}
+        onPointerCancel={() => { pointerStart.current = null; didSwipe.current = false }}
+        onPointerUp={(event) => {
+          if (pointerStart.current === null) return
+          const distance = event.clientX - pointerStart.current
+          pointerStart.current = null
+          if (Math.abs(distance) > 42) {
+            didSwipe.current = true
+            move(distance > 0 ? -1 : 1)
+            window.setTimeout(() => { didSwipe.current = false }, 0)
+          }
+        }}
+      >
+        <div className="carousel-track" style={{ transform: `translate3d(calc(${index} * var(--slide-step) * -1), 0, 0)`, transition: animated ? 'transform 680ms cubic-bezier(.22,.72,.25,1)' : 'none' }} onTransitionEnd={normalize}>
           {tripled.map((slide, i) => (
             <button className={`demo-slide tone-${slide.tone}`} type="button" key={`${slide.title}-${i}`} onClick={() => openSlide(i)} aria-label={`Ampliar exemplo: ${slide.title}`}>
               {slide.image ? <img src={slide.image} alt={`Exemplo do material ${slide.title}`} loading="lazy" /> : <div className="slide-placeholder"><span className="slide-number">{String((i % total) + 1).padStart(2, '0')}</span><div><small>MAPA VISUAL</small><h3>{slide.title}</h3><p>{slide.label}</p></div><span className="expand-label">Ampliar <span aria-hidden="true">↗</span></span></div>}
@@ -136,9 +182,6 @@ function Carousel({ onOpen }: { onOpen: (index: number) => void }) {
           <button className="icon-button" type="button" onClick={() => move(1)} aria-label="Próximo exemplo">→</button>
         </div>
         <span className="carousel-status">{String((index % total) + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
-        <button className="pause-button" type="button" onClick={() => setManualPause((value) => !value)} disabled={reducedMotion}>
-          {reducedMotion ? 'Movimento reduzido ativo' : manualPause ? 'Retomar reprodução' : 'Pausar reprodução'}
-        </button>
       </div>
     </div>
   )
@@ -231,24 +274,22 @@ function App() {
 
       <main id="top">
         <section className="hero section-pad">
-          <div className="hero-copy">
-            <span className="eyebrow"><span></span> BIBLIOTECA VISUAL DE GESTÃO</span>
-            <h1><em>100 Mapas Visuais de Gestão</em> para entender as ferramentas sem se perder em páginas e páginas de teoria.</h1>
-            <p className="hero-lead">Aprenda e revise conceitos de Administração, Estratégia, Processos, Qualidade, Logística e Gestão de Pessoas com explicações visuais, exemplos práticos e materiais organizados para consultar ou imprimir.</p>
-            <ul className="hero-benefits">
-              <li><Icon name="check" /> 100 mapas organizados em 6 módulos.</li>
-              <li><Icon name="check" /> Explicações e exemplos de aplicação.</li>
-              <li><Icon name="check" /> PDFs para estudar no celular ou imprimir.</li>
-            </ul>
-            <button className="button button-primary" onClick={() => scrollTo('demonstracao')}>QUERO EXPLORAR OS MAPAS <span aria-hidden="true">↓</span></button>
-            <p className="microcopy">Material digital em PDF • Consulta no celular e computador • Pronto para imprimir</p>
-          </div>
-          <div className="hero-visual"><div className="hero-glow"></div><ImageSlot src={imageConfig.hero} label="Apresentação visual do PRISMA — Gestão na Prática" className="hero-slot" priority /><div className="floating-note note-one"><strong>100</strong><span>mapas visuais</span></div><div className="floating-note note-two"><strong>6</strong><span>áreas de gestão</span></div></div>
+          <span className="eyebrow"><span></span> BIBLIOTECA VISUAL DE GESTÃO</span>
+          <h1><em>100 Mapas Visuais de Gestão</em> para entender as ferramentas sem se perder em páginas e páginas de teoria.</h1>
+          <div className="hero-visual"><div className="hero-glow"></div><ImageSlot src={imageConfig.hero} label="Apresentação visual do PRISMA — Gestão na Prática" className="hero-slot" priority /></div>
+          <p className="hero-lead">Aprenda e revise conceitos de Administração, Estratégia, Processos, Qualidade, Logística e Gestão de Pessoas com explicações visuais, exemplos práticos e materiais organizados para consultar ou imprimir.</p>
+          <ul className="hero-benefits">
+            <li><Icon name="check" /> 100 mapas organizados em 6 módulos.</li>
+            <li><Icon name="check" /> Explicações e exemplos de aplicação.</li>
+            <li><Icon name="check" /> PDFs para estudar no celular ou imprimir.</li>
+          </ul>
+          <button className="button button-primary" onClick={() => scrollTo('demonstracao')}>QUERO EXPLORAR OS MAPAS <span aria-hidden="true">↓</span></button>
+          <p className="microcopy">Material digital em PDF • Consulta no celular e computador • Pronto para imprimir</p>
         </section>
 
         <section className="demo section-pad" id="demonstracao">
           <div className="section-heading"><span className="eyebrow">PRÉVIA DO CONTEÚDO</span><h2>Veja alguns dos mapas que você vai receber.</h2><p>Explore as ferramentas por dentro e veja como os conceitos são apresentados com explicações, exemplos e aplicações práticas.</p><small className="carousel-instruction">Passe para explorar os mapas. Clique em um material para ampliar.</small></div>
-          <Carousel onOpen={setPreviewIndex} />
+          <Carousel onOpen={setPreviewIndex} previewOpen={previewIndex !== null} />
         </section>
 
         <section className="modules section-pad section-light" id="modulos">
@@ -329,3 +370,4 @@ function App() {
 }
 
 export default App
+
