@@ -76,6 +76,7 @@ p { line-height: 1.75; color: var(--muted); }
 .image-slot { min-height: 220px; border: 1px dashed #b7c8cb; border-radius: 17px; background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,243,241,.92)); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 9px; padding: 28px; color: #4f6575; font-size: 12px; font-weight: 800; letter-spacing: .06em; overflow: hidden; }
 .image-slot small { color: #8a989f; font-weight: 600; letter-spacing: 0; }
 .image-slot.has-image { padding: 0; border-style: solid; background: #eef3f2; }
+.image-slot picture, .bonus-visual picture, .demo-slide picture { display: block; width: 100%; height: 100%; }
 .image-slot img { width: 100%; height: 100%; object-fit: contain; }
 .slot-mark { width: 50px; height: 50px; border-radius: 13px; display: grid; place-items: center; background: var(--navy); color: white; font-size: 20px; }
 .hero-slot { min-height: 0; aspect-ratio: 16 / 9; transform: none; box-shadow: none; border-color: transparent; background: transparent; position: relative; z-index: 1; }
@@ -112,10 +113,11 @@ p { line-height: 1.75; color: var(--muted); }
 .carousel-viewport { overflow: hidden; touch-action: pan-y; padding: 4px 0 13px; }
 .carousel-track { display: flex; width: max-content; will-change: transform; animation: carousel-marquee var(--carousel-duration) linear infinite; }
 .carousel-set { display: flex; gap: var(--slide-gap); padding-right: var(--slide-gap); }
+.carousel-shell:not(.is-ready) .carousel-track { animation-play-state: paused; }
 .carousel-shell.is-paused .carousel-track { animation-play-state: paused; }
 @keyframes carousel-marquee { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .demo-slide { flex: 0 0 var(--slide-width); aspect-ratio: 894 / 630; height: auto; padding: 0; text-align: left; border: 0; border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 12px 34px rgba(8,35,63,.12); background: #eaf0f2; }
-.demo-slide img { width: 100%; height: 100%; object-fit: contain; background: white; }
+.demo-slide img { display: block; width: 100%; height: 100%; object-fit: contain; background: white; }
 .slide-placeholder { height: 100%; padding: 30px; display: flex; flex-direction: column; justify-content: flex-end; color: white; position: relative; background: linear-gradient(145deg, var(--slide-color), color-mix(in srgb, var(--slide-color), #071e34 42%)); }
 .slide-placeholder::before { content: ''; position: absolute; width: 250px; height: 250px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; top: -110px; right: -80px; box-shadow: 0 0 0 34px rgba(255,255,255,.035), 0 0 0 70px rgba(255,255,255,.025); }
 .slide-number { position: absolute; top: 25px; left: 28px; font-size: 12px; font-weight: 800; opacity: .7; }

@@ -4,6 +4,56 @@ import { trackEvent } from './tracking'
 
 type IconName = 'grid' | 'example' | 'layers' | 'file' | 'book' | 'compare' | 'cards' | 'search' | 'check' | 'x'
 
+const imageDimensions: Record<string, { width: number; height: number }> = {
+  '/images/hero-prisma.png': { width: 1672, height: 941 },
+  '/images/package-basic.png': { width: 1254, height: 1254 },
+  '/images/package-premium.png': { width: 1254, height: 1254 },
+  '/images/bonus-comparatives.png': { width: 1122, height: 1402 },
+  '/images/bonus-flashcards.png': { width: 1122, height: 1402 },
+  '/images/bonus-glossary.png': { width: 1122, height: 1402 },
+  '/images/map-5w2h.png': { width: 1448, height: 1086 },
+  '/images/carousel-pdca.png': { width: 896, height: 632 },
+  '/images/carousel-swot.png': { width: 894, height: 630 },
+  '/images/carousel-gut.png': { width: 894, height: 630 },
+  '/images/carousel-5w2h.png': { width: 894, height: 628 },
+  '/images/carousel-ishikawa.png': { width: 895, height: 631 },
+  '/images/carousel-5s.png': { width: 898, height: 632 },
+  '/images/carousel-one-on-one.png': { width: 895, height: 630 },
+  '/images/module-strategy.png': { width: 1448, height: 1086 },
+  '/images/module-processes.png': { width: 1448, height: 1086 },
+  '/images/module-projects.png': { width: 1448, height: 1086 },
+  '/images/module-logistics.png': { width: 1448, height: 1086 },
+  '/images/module-people.png': { width: 1448, height: 1086 },
+  '/images/module-indicators.png': { width: 1448, height: 1086 },
+}
+
+function optimizedImageSources(src: string) {
+  const dimensions = imageDimensions[src]
+  if (!dimensions) return null
+  const base = src.replace('/images/', '/images/optimized/').replace(/\.png$/i, '')
+  const candidates = [640, 960].filter((width) => width < dimensions.width)
+  return [...candidates.map((width) => `${base}-${width}.webp ${width}w`), `${base}.webp ${dimensions.width}w`].join(', ')
+}
+
+function ResponsiveImage({ src, alt, priority = false, eager = false, sizes = '100vw', onLoad, onError }: { src: string; alt: string; priority?: boolean; eager?: boolean; sizes?: string; onLoad?: () => void; onError?: () => void }) {
+  const dimensions = imageDimensions[src]
+  const webpSources = optimizedImageSources(src)
+  const image = (
+    <img
+      src={src}
+      alt={alt}
+      width={dimensions?.width}
+      height={dimensions?.height}
+      loading={priority || eager ? 'eager' : 'lazy'}
+      decoding={priority ? 'sync' : 'async'}
+      fetchPriority={priority ? 'high' : eager ? 'auto' : 'low'}
+      onLoad={onLoad}
+      onError={onError}
+    />
+  )
+  return webpSources ? <picture><source type="image/webp" srcSet={webpSources} sizes={sizes} />{image}</picture> : image
+}
+
 const modules = [
   { number: '01', title: 'Estratégia e Planejamento', count: 20, description: 'Conheça ferramentas para analisar cenários, definir prioridades, organizar objetivos e estruturar planos.', image: imageConfig.modules.strategy },
   { number: '02', title: 'Processos e Qualidade', count: 20, description: 'Estude métodos para compreender processos, identificar problemas e organizar ações de melhoria.', image: imageConfig.modules.processes },
@@ -51,9 +101,18 @@ function Icon({ name }: { name: IconName }) {
 }
 
 function ImageSlot({ src, label, className = '', priority = false }: { src: string | null; label: string; className?: string; priority?: boolean }) {
+  const sizes = className.includes('hero-slot')
+    ? '(max-width: 900px) calc(100vw - 36px), 52vw'
+    : className.includes('module-image')
+      ? '(max-width: 720px) calc(100vw - 36px), (max-width: 980px) 50vw, 360px'
+      : className.includes('offer-image') || className.includes('upgrade-image')
+        ? '(max-width: 720px) calc(100vw - 36px), 500px'
+        : className.includes('preview-image')
+          ? 'min(900px, calc(100vw - 40px))'
+          : '(max-width: 720px) calc(100vw - 36px), 600px'
   return (
     <div className={`image-slot ${className} ${src ? 'has-image' : ''}`}>
-      {src ? <img src={src} alt={label} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} /> : <><span className="slot-mark">P</span><span>{label}</span><small>Imagem preparada para inserir depois</small></>}
+      {src ? <ResponsiveImage src={src} alt={label} priority={priority} sizes={sizes} /> : <><span className="slot-mark">P</span><span>{label}</span><small>Imagem preparada para inserir depois</small></>}
     </div>
   )
 }
@@ -72,8 +131,24 @@ function appendCampaignParams(target: string) {
 }
 
 function Carousel({ onOpen, previewOpen }: { onOpen: (index: number) => void; previewOpen: boolean }) {
+  const [loadSlides, setLoadSlides] = useState(false)
+  const [slidesReady, setSlidesReady] = useState(false)
+  const loadedSlides = useRef(new Set<number>())
+
+  useEffect(() => {
+    const startLoading = () => setLoadSlides(true)
+    if (document.readyState === 'complete') startLoading()
+    else window.addEventListener('load', startLoading, { once: true })
+    return () => window.removeEventListener('load', startLoading)
+  }, [])
+
+  const markSlideReady = (index: number) => {
+    loadedSlides.current.add(index)
+    if (loadedSlides.current.size === slides.length) setSlidesReady(true)
+  }
+
   return (
-    <div className={`carousel-shell ${previewOpen ? 'is-paused' : ''}`}>
+    <div className={`carousel-shell ${previewOpen ? 'is-paused' : ''} ${slidesReady ? 'is-ready' : ''}`}>
       <div className="carousel-viewport">
         <div className="carousel-track">
           {[0, 1].map((setIndex) => (
@@ -87,7 +162,7 @@ function Carousel({ onOpen, previewOpen }: { onOpen: (index: number) => void; pr
                   tabIndex={setIndex === 1 ? -1 : 0}
                   aria-label={`Ampliar exemplo: ${slide.title}`}
                 >
-                  {slide.image ? <img src={slide.image} alt={`Exemplo do material ${slide.title}`} loading="lazy" /> : <div className="slide-placeholder"><span className="slide-number">{String(slideIndex + 1).padStart(2, '0')}</span><div><small>MAPA VISUAL</small><h3>{slide.title}</h3><p>{slide.label}</p></div><span className="expand-label">Ampliar <span aria-hidden="true">↗</span></span></div>}
+                  {slide.image ? <ResponsiveImage src={slide.image} alt={`Exemplo do material ${slide.title}`} eager={loadSlides} sizes="(max-width: 720px) calc(100vw - 36px), 560px" onLoad={setIndex === 0 ? () => markSlideReady(slideIndex) : undefined} onError={setIndex === 0 ? () => markSlideReady(slideIndex) : undefined} /> : <div className="slide-placeholder"><span className="slide-number">{String(slideIndex + 1).padStart(2, '0')}</span><div><small>MAPA VISUAL</small><h3>{slide.title}</h3><p>{slide.label}</p></div><span className="expand-label">Ampliar <span aria-hidden="true">↗</span></span></div>}
                 </button>
               ))}
             </div>
@@ -242,7 +317,7 @@ function App() {
               ['compare', 'BÔNUS 1', '20 Comparativos de Gestão', 'Consulte diferenças entre ferramentas e conceitos apresentados lado a lado, facilitando a identificação de suas características e aplicações.', imageConfig.bonusComparatives],
               ['cards', 'BÔNUS 2', '40 Flashcards para Revisão', 'Perguntas e respostas organizadas para revisar conceitos e verificar o que você lembra dos assuntos estudados.', imageConfig.bonusFlashcards],
               ['search', 'BÔNUS 3', 'Glossário com 100 Termos de Gestão', 'Uma referência de consulta para compreender expressões e conceitos utilizados em Administração e Gestão.', imageConfig.bonusGlossary],
-            ].map(([icon, overline, title, text, image]) => <article className="bonus-card" key={title}><div className={`bonus-visual ${image ? 'has-image' : ''}`}>{image ? <img src={image} alt={`Imagem do ${title}`} loading="lazy" /> : <><Icon name={icon as IconName} /><span>IMAGEM DO {overline}</span></>}</div><span className="bonus-overline">{overline}</span><h3>{title}</h3><p>{text}</p></article>)}
+            ].map(([icon, overline, title, text, image]) => <article className="bonus-card" key={title}><div className={`bonus-visual ${image ? 'has-image' : ''}`}>{image ? <ResponsiveImage src={image} alt={`Imagem do ${title}`} sizes="(max-width: 720px) calc(100vw - 36px), 360px" /> : <><Icon name={icon as IconName} /><span>IMAGEM DO {overline}</span></>}</div><span className="bonus-overline">{overline}</span><h3>{title}</h3><p>{text}</p></article>)}
           </div>
           <p className="bonus-note"><Icon name="check" /> Os três bônus fazem parte do Premium e da opção promocional do pacote completo.</p>
         </section>
