@@ -244,6 +244,7 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
 .upgrade-price strong { display: block; color: var(--navy); font-size: 31px; margin: 3px 0; }.upgrade-price strong small { font-size: 13px; }
 .upgrade-price p { margin: 0; color: #087f6c; font-size: 11px; font-weight: 800; }
 .upgrade-content .button { width: 100%; }
+.upgrade-actions { display: grid; }
 .decline-button { width: 100%; border: 0; background: transparent; color: #536a7a; text-decoration: underline; text-underline-offset: 3px; font-size: 10px; font-weight: 750; padding: 15px 5px; }
 .upgrade-clarity { display: block; color: #829099; font-size: 9px; text-align: center; line-height: 1.5; }
 .toast { position: fixed; z-index: 150; left: 50%; bottom: 25px; width: min(520px, calc(100% - 32px)); transform: translate(-50%, 30px); padding: 14px 18px; border-radius: 10px; background: var(--navy); color: white; font-size: 12px; line-height: 1.5; box-shadow: 0 18px 50px rgba(0,0,0,.25); opacity: 0; visibility: hidden; transition: .25s ease; }
@@ -290,7 +291,27 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   .accordion summary { font-size: 13px; }.accordion details p { margin-right: 15px; }
   .footer-main { grid-template-columns: 1fr; gap: 32px; }.footer-bottom { flex-direction: column; gap: 7px; }
   .dialog-backdrop { padding: 10px; align-items: center; }.dialog { max-height: calc(100dvh - 20px); padding: 27px 19px; border-radius: 15px; }.dialog-close { right: 10px; top: 10px; }.dialog h2 { font-size: 25px; }
-  .upgrade-dialog { padding: 12px; }.upgrade-layout { grid-template-columns: 1fr; gap: 8px; }.upgrade-image { min-height: 170px; }.upgrade-content { padding: 18px 5px 5px; }.upgrade-content ul { display: grid; }.upgrade-content .button { min-height: 50px; padding: 13px 10px; font-size: 10px; }
+  .upgrade-dialog { width: min(94vw, 430px); height: auto; max-height: min(58dvh, 500px); padding: 11px; overflow: hidden; border-radius: 17px; }
+  .upgrade-dialog .dialog-close { width: 32px; height: 32px; right: 8px; top: 8px; }
+  .upgrade-dialog .dialog-close .icon { width: 15px; height: 15px; }
+  .upgrade-layout { height: auto; max-height: calc(min(58dvh, 500px) - 22px); grid-template-columns: 92px minmax(0, 1fr); grid-template-rows: auto auto auto auto auto auto; gap: 7px 11px; align-content: start; overflow-y: auto; overscroll-behavior: contain; padding: 4px 4px 7px; scrollbar-width: thin; }
+  .upgrade-content { display: contents; }
+  .upgrade-content .dialog-overline { grid-column: 1 / -1; grid-row: 1; margin: 0; padding-right: 36px; font-size: 8px; }
+  .upgrade-content h2 { grid-column: 1 / -1; grid-row: 2; margin: 0 38px 1px 0; padding: 0; font-size: 20px; line-height: 1.08; }
+  .upgrade-image { grid-column: 1; grid-row: 3; width: 92px; min-height: 0; aspect-ratio: 1 / 1; border-radius: 10px; align-self: start; }
+  .upgrade-content > p { grid-column: 2; grid-row: 3; margin: 0; font-size: 10.5px; line-height: 1.4; align-self: center; }
+  .upgrade-content ul { grid-column: 1 / -1; grid-row: 4; display: flex; flex-wrap: wrap; gap: 5px 10px; margin: 1px 0; }
+  .upgrade-content li { font-size: 9.5px; }
+  .upgrade-content li .icon { width: 14px; height: 14px; }
+  .upgrade-price { grid-column: 1 / -1; grid-row: 5; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1px 10px; margin: 0; padding: 8px 10px; }
+  .upgrade-price > span { grid-column: 1; font-size: 9px; line-height: 1.3; }
+  .upgrade-price strong { grid-column: 2; grid-row: 1 / 3; font-size: 26px; line-height: 1; margin: 0; white-space: nowrap; }
+  .upgrade-price strong small { display: block; margin-top: 3px; font-size: 9px; text-align: right; }
+  .upgrade-price p { grid-column: 1; font-size: 9.5px; }
+  .upgrade-actions { grid-column: 1 / -1; grid-row: 6; position: sticky; bottom: -7px; z-index: 1; padding: 5px 0 2px; background: linear-gradient(to bottom, rgba(255,255,255,.92), #fff 12px); }
+  .upgrade-content .button { min-height: 42px; padding: 10px 8px; font-size: 9.5px; }
+  .decline-button { padding: 8px 4px 6px; font-size: 9px; }
+  .upgrade-clarity { font-size: 8px; line-height: 1.35; }
 }
 
 @media (max-width: 370px) {
@@ -298,6 +319,10 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   .hero h1 { font-size: 32px; }.hero-slot { min-height: 0; }.image-slot { font-size: 10px; }
   .slide-placeholder h3 { font-size: 22px; }.slide-placeholder p { max-width: 210px; }.expand-label { display: none; }
   .offer-body { padding-inline: 19px; }.offer-card .button { padding-inline: 10px; }
+  .upgrade-dialog { width: calc(100vw - 16px); max-height: min(62dvh, 410px); padding: 9px; }
+  .upgrade-layout { max-height: calc(min(62dvh, 410px) - 18px); grid-template-columns: 82px minmax(0, 1fr); gap: 6px 9px; }
+  .upgrade-image { width: 82px; }
+  .upgrade-content h2 { font-size: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
