@@ -7,9 +7,9 @@ export const siteConfig = {
     upgradeDifference: 'R$5',
   },
   checkouts: {
-    checkoutBasico: null as string | null,
-    checkoutPremium: null as string | null,
-    checkoutPromocional: null as string | null,
+    checkoutBasico: 'https://pay.lowify.com.br/checkout?product_id=0ctn3z' as string | null,
+    checkoutPremium: 'https://pay.lowify.com.br/checkout?product_id=O2TR9A' as string | null,
+    checkoutPromocional: 'https://pay.lowify.com.br/go.php?offer=e44bd1f8' as string | null,
   },
   contact: {
     email: null as string | null,
@@ -31,8 +31,8 @@ export const siteConfig = {
     supportInfo: null as string | null,
   },
   tracking: {
-    metaPixelId: null as string | null,
-    consentGranted: false,
+    metaPixelId: '1430848232335737' as string | null,
+    consentGranted: true,
   },
 } as const
 

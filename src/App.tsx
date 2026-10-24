@@ -209,7 +209,6 @@ function App() {
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const [openFaq, setOpenFaq] = useState<number | null>(0)
-  const offersRef = useRef<HTMLElement>(null)
   const visibleFaqs = [
     ...faqs.slice(0, 7),
     ...(siteConfig.delivery.instructions ? [['Como recebo os arquivos?', siteConfig.delivery.instructions]] : []),
@@ -224,11 +223,11 @@ function App() {
 
   useEffect(() => {
     trackEvent('PageView', {}, true)
-    const section = offersRef.current
-    if (!section) return
-    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) trackEvent('ViewOffers', {}, true) }, { threshold: 0.35 })
-    observer.observe(section)
-    return () => observer.disconnect()
+    trackEvent('ViewContent', {
+      content_name: 'PRISMA — Gestão na Prática',
+      content_category: 'Material Digital de Gestão',
+      content_type: 'product',
+    }, true)
   }, [])
 
   function showNotice(message: string) {
@@ -241,13 +240,10 @@ function App() {
       showNotice(`O checkout ${plan} ainda precisa ser conectado no arquivo src/config.ts.`)
       return
     }
-    trackEvent('InitiateCheckout', { plan })
     window.location.assign(appendCampaignParams(url))
   }
 
   function openBasicOffer() {
-    trackEvent('ClickBasic')
-    trackEvent('OpenUpgradeOffer')
     setUpgradeOpen(true)
   }
 
@@ -322,13 +318,13 @@ function App() {
           <p className="bonus-note"><Icon name="check" /> Os três bônus fazem parte do Premium e da opção promocional do pacote completo.</p>
         </section>
 
-        <section className="offers section-pad" id="ofertas" ref={offersRef}>
+        <section className="offers section-pad" id="ofertas">
           <div className="section-heading"><span className="eyebrow">ESCOLHA SEU PACOTE</span><h2>Escolha como você quer acessar sua biblioteca de gestão.</h2><p>Pagamento único. Material digital em PDF.</p></div>
           <div className="offer-grid">
             <article className="offer-card basic"><ImageSlot src={imageConfig.basicPackage} label="IMAGEM DO PACOTE BÁSICO" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE BÁSICO</span><h3>PRISMA Essencial — 100 Mapas</h3><p className="plan-support">Para quem quer estudar e consultar os 100 mapas visuais de gestão.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.basic}</strong></div><ul><li><Icon name="check" /> 100 mapas visuais.</li><li><Icon name="check" /> 6 módulos completos.</li><li><Icon name="check" /> Explicações e exemplos práticos.</li><li><Icon name="check" /> PDF para consulta no celular e impressão.</li><li className="not-included"><Icon name="x" /> Não inclui os três bônus.</li></ul><button className="button button-outline" onClick={openBasicOffer}>QUERO OS 100 MAPAS</button></div></article>
-            <article className="offer-card premium"><span className="premium-ribbon">MAIS VENDIDO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><p className="premium-value-highlight">100 mapas visuais + 3 bônus exclusivos</p><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => { trackEvent('ClickPremium'); checkout(siteConfig.checkouts.checkoutPremium, 'Premium') }}>QUERO O PRISMA COMPLETO</button></div></article>
+            <article className="offer-card premium"><span className="premium-ribbon">MAIS VENDIDO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><p className="premium-value-highlight">100 mapas visuais + 3 bônus exclusivos</p><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => checkout(siteConfig.checkouts.checkoutPremium, 'Premium')}>QUERO O PRISMA COMPLETO</button></div></article>
           </div>
-          <p className="secure-note"><span aria-hidden="true">◇</span> Os links de checkout serão conectados antes da publicação. Nenhuma cobrança ocorre nesta versão local.</p>
+          <p className="secure-note"><span aria-hidden="true">◇</span> Ao escolher uma opção, você será direcionado ao checkout correspondente da Lowify.</p>
         </section>
 
         {trustItems.length > 0 && <section className="trust-section section-pad section-light"><div className="section-heading"><span className="eyebrow">COMPRA E SUPORTE</span><h2>Informações transparentes antes da compra.</h2></div><div className="trust-grid">{trustItems.map((item) => <article key={item.title}><Icon name="check" /><h3>{item.title}</h3><p>{item.text}</p></article>)}</div></section>}
@@ -347,7 +343,7 @@ function App() {
       </Dialog>
 
       <Dialog open={upgradeOpen} onClose={() => setUpgradeOpen(false)} labelledBy="upgrade-title" className="upgrade-dialog">
-        <div className="upgrade-layout"><ImageSlot src={imageConfig.bonuses} label="IMAGEM DOS TRÊS BÔNUS" className="upgrade-image" /><div className="upgrade-content"><span className="dialog-overline">OFERTA OPCIONAL</span><h2 id="upgrade-title">Antes de finalizar: leve os 3 bônus por apenas {siteConfig.prices.upgradeDifference} a mais.</h2><p>Você já escolheu os 100 mapas de gestão. Agora pode receber também os 20 comparativos, os 40 flashcards e o glossário de 100 termos.</p><ul><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li></ul><div className="upgrade-price"><span>Em vez de pagar <s>{siteConfig.prices.premium}</s> pelo Premium:</span><strong>{siteConfig.prices.promotional} <small>no total</small></strong><p>100 mapas + 3 bônus por {siteConfig.prices.promotional}.</p></div><button className="button button-primary" onClick={() => { trackEvent('AcceptUpgradeOffer'); checkout(siteConfig.checkouts.checkoutPromocional, 'Premium promocional') }}>SIM, QUERO TUDO POR {siteConfig.prices.promotional}</button><button className="decline-button" onClick={() => { trackEvent('DeclineUpgradeOffer'); checkout(siteConfig.checkouts.checkoutBasico, 'Básico') }}>NÃO, QUERO SOMENTE OS 100 MAPAS POR {siteConfig.prices.basic}</button><small className="upgrade-clarity">Você escolhe uma das opções. {siteConfig.prices.promotional} é o valor total do Premium promocional e substitui o Básico; não é uma cobrança adicional.</small></div></div>
+        <div className="upgrade-layout"><ImageSlot src={imageConfig.bonuses} label="IMAGEM DOS TRÊS BÔNUS" className="upgrade-image" /><div className="upgrade-content"><span className="dialog-overline">OFERTA OPCIONAL</span><h2 id="upgrade-title">Antes de finalizar: leve os 3 bônus por apenas {siteConfig.prices.upgradeDifference} a mais.</h2><p>Você já escolheu os 100 mapas de gestão. Agora pode receber também os 20 comparativos, os 40 flashcards e o glossário de 100 termos.</p><ul><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li></ul><div className="upgrade-price"><span>Em vez de pagar <s>{siteConfig.prices.premium}</s> pelo Premium:</span><strong>{siteConfig.prices.promotional} <small>no total</small></strong><p>100 mapas + 3 bônus por {siteConfig.prices.promotional}.</p></div><button className="button button-primary" onClick={() => checkout(siteConfig.checkouts.checkoutPromocional, 'Premium promocional')}>SIM, QUERO TUDO POR {siteConfig.prices.promotional}</button><button className="decline-button" onClick={() => checkout(siteConfig.checkouts.checkoutBasico, 'Básico')}>NÃO, QUERO SOMENTE OS 100 MAPAS POR {siteConfig.prices.basic}</button><small className="upgrade-clarity">Você escolhe uma das opções. {siteConfig.prices.promotional} é o valor total do Premium promocional e substitui o Básico; não é uma cobrança adicional.</small></div></div>
       </Dialog>
 
       <div className={`toast ${notice ? 'visible' : ''}`} role="status" aria-live="polite">{notice}</div>
