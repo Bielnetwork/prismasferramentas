@@ -12,7 +12,7 @@ export const siteConfig = {
     checkoutPromocional: 'https://pay.lowify.com.br/go.php?offer=e44bd1f8' as string | null,
   },
   contact: {
-    email: null as string | null,
+    email: 'bielnetwork2008@gmail.com' as string | null,
     supportText: 'Canal de suporte pendente de configuração.',
   },
   legal: {

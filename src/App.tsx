@@ -74,14 +74,12 @@ const slides = [
 ]
 
 const faqs = [
-  ['O que recebo no Básico?', 'Você recebe os 100 mapas visuais de gestão, distribuídos em seis módulos, em arquivos digitais PDF.'],
-  ['Qual é a diferença entre Básico e Premium?', 'O Premium inclui os mesmos 100 mapas e acrescenta 20 comparativos, 40 flashcards e um glossário com 100 termos.'],
-  ['Os materiais são físicos?', 'Não. O PRISMA é um produto digital. Você recebe arquivos para consulta e impressão.'],
-  ['Posso estudar pelo celular?', 'Sim. Os PDFs podem ser abertos no celular, tablet ou computador com um leitor compatível.'],
-  ['Posso imprimir?', 'Sim. Você pode imprimir os mapas que desejar utilizar.'],
-  ['Preciso instalar um aplicativo?', 'Não. O PRISMA não exige a instalação de um aplicativo próprio.'],
-  ['O pagamento é mensal?', 'Não. O preço anunciado corresponde a um pagamento único.'],
-  ['O material substitui um curso?', 'Não. É um material complementar de estudo e consulta.'],
+  ['Para quem o PRISMA é indicado?', 'Para estudantes, profissionais e pessoas que desejam compreender e revisar ferramentas de gestão. É um material complementar, não um curso ou certificação.'],
+  ['Qual é a diferença entre Essencial e Completo?', 'O Essencial reúne os 100 mapas em 6 módulos. O Completo inclui também 20 comparativos, 40 flashcards e um glossário de 100 termos.'],
+  ['Os materiais são físicos? Posso imprimir?', 'O produto é digital, em PDF. Os arquivos podem ser abertos em dispositivos compatíveis e impressos.'],
+  ['Preciso instalar algum aplicativo?', 'Não é necessário um aplicativo próprio do PRISMA. Basta um leitor de PDF compatível.'],
+  ['O pagamento é único ou mensal?', 'É um pagamento único, sem mensalidade pelo material anunciado.'],
+  ['O PRISMA substitui um curso?', 'Não. É um material complementar para estudo, revisão e consulta.'],
 ]
 
 function Icon({ name }: { name: IconName }) {
@@ -209,10 +207,13 @@ function App() {
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const supportAndRefund = [siteConfig.trust.supportInfo, siteConfig.trust.refundInfo].filter(Boolean).join(' ')
   const visibleFaqs = [
-    ...faqs.slice(0, 7),
-    ...(siteConfig.delivery.instructions ? [['Como recebo os arquivos?', siteConfig.delivery.instructions]] : []),
-    faqs[7],
+    ...faqs.slice(0, 3),
+    ...(siteConfig.delivery.instructions ? [['Como recebo os arquivos após a compra?', siteConfig.delivery.instructions]] : []),
+    ...faqs.slice(3, 5),
+    ...(supportAndRefund ? [['Como funciona o suporte e o reembolso?', supportAndRefund]] : []),
+    faqs[5],
   ]
   const trustItems = [
     { title: 'Pagamento', text: siteConfig.trust.paymentInfo },
@@ -257,16 +258,24 @@ function App() {
       <main id="top">
         <section className="hero section-pad">
           <span className="eyebrow"><span></span> BIBLIOTECA VISUAL DE GESTÃO</span>
-          <h1><em>100 Mapas Visuais de Gestão</em> para entender as ferramentas sem se perder em páginas e páginas de teoria.</h1>
+          <h1>Entenda as principais ferramentas de gestão sem se perder em teorias complicadas, com <em>100 mapas visuais.</em></h1>
           <div className="hero-visual"><div className="hero-glow"></div><ImageSlot src={imageConfig.hero} label="Apresentação visual do PRISMA — Gestão na Prática" className="hero-slot" priority /></div>
-          <p className="hero-lead">Aprenda e revise conceitos de Administração, Estratégia, Processos, Qualidade, Logística e Gestão de Pessoas com explicações visuais, exemplos práticos e materiais organizados para consultar ou imprimir.</p>
+          <p className="hero-lead">100 mapas organizados em 6 módulos, com explicações simples, exemplos práticos e orientações sobre quando utilizar cada ferramenta. Um material para estudar, revisar e consultar sempre que precisar.</p>
           <ul className="hero-benefits">
             <li><Icon name="check" /> 100 mapas organizados em 6 módulos.</li>
             <li><Icon name="check" /> Explicações e exemplos de aplicação.</li>
             <li><Icon name="check" /> PDFs para estudar no celular ou imprimir.</li>
           </ul>
-          <button className="button button-primary" onClick={() => scrollTo('demonstracao')}>QUERO EXPLORAR OS MAPAS <span aria-hidden="true">↓</span></button>
-          <p className="microcopy">Material digital em PDF • Consulta no celular e computador • Pronto para imprimir</p>
+          <button className="button button-primary" onClick={() => scrollTo('ofertas')}>QUERO OS 100 MAPAS VISUAIS <span aria-hidden="true">↓</span></button>
+          <p className="microcopy">Para estudantes, profissionais e quem deseja entender ferramentas de gestão • Material digital em PDF</p>
+        </section>
+
+        <section className="practical pain-comparison section-pad section-light" id="conteudo">
+          <div className="section-heading narrow"><span className="eyebrow">INFORMAÇÃO ORGANIZADA</span><h2>Você já estudou SWOT, PDCA ou Matriz GUT, mas, na hora de resolver um problema, ainda fica na dúvida sobre qual ferramenta usar?</h2><p>São muitas siglas, conceitos e métodos para aprender. E mesmo depois de estudar, nem sempre é fácil lembrar as diferenças ou entender em quais situações cada ferramenta pode ser utilizada.</p></div>
+          <div className="comparison pain-comparison-grid">
+            <article className="comparison-card muted"><span className="comparison-label">SEM O PRISMA</span><ul><li><Icon name="x" /> Confunde as funções das ferramentas.</li><li><Icon name="x" /> Fica em dúvida sobre quando usar cada uma.</li><li><Icon name="x" /> Precisa pesquisar explicações em vários lugares.</li></ul></article>
+            <article className="comparison-card positive"><span className="comparison-label">COM O PRISMA</span><ul><li><Icon name="check" /> Consulta explicações visuais dos conceitos.</li><li><Icon name="check" /> Encontra exemplos de aplicação.</li><li><Icon name="check" /> Tem os assuntos reunidos e organizados.</li></ul></article>
+          </div>
         </section>
 
         <section className="demo section-pad" id="demonstracao">
@@ -274,36 +283,26 @@ function App() {
           <Carousel onOpen={setPreviewIndex} previewOpen={previewIndex !== null} />
         </section>
 
+        <section className="commercial-benefits section-pad section-navy">
+          <div className="section-heading light"><span className="eyebrow eyebrow-light">MAIS PRATICIDADE</span><h2>Menos tempo procurando explicações. Mais praticidade para estudar e revisar.</h2><p>Em vez de consultar várias fontes toda vez que surgir uma dúvida, tenha os principais conceitos reunidos em materiais visuais e organizados.</p></div>
+          <div className="benefit-grid four-benefits">
+            {[
+              ['grid', 'Entenda sem complicação', 'Aprenda conceitos de gestão com explicações visuais e resumos que destacam os pontos principais de cada ferramenta.'],
+              ['compare', 'Saiba diferenciar as ferramentas', 'Compreenda a finalidade de cada método e conheça situações em que ele pode ser utilizado.'],
+              ['example', 'Veja exemplos práticos', 'Encontre situações que ajudam a entender como as ferramentas aparecem no planejamento, na organização e na gestão.'],
+              ['book', 'Consulte sempre que precisar', 'Tenha 100 mapas organizados em 6 módulos para estudar, revisar e consultar no celular ou computador.'],
+            ].map(([icon, title, text], i) => <article className="benefit-card" key={title}><span className="benefit-index">0{i + 1}</span><Icon name={icon as IconName} /><h3>{title}</h3><p>{text}</p></article>)}
+          </div>
+          <div className="benefits-practical">
+            <div className="benefits-practical-copy"><span className="eyebrow eyebrow-light">EXEMPLO PRÁTICO</span><h3>Precisa organizar um projeto, mas não sabe por onde começar?</h3><p>Imagine que você precisa definir tarefas, responsáveis e prazos para colocar uma ideia em prática.</p><p>Uma ferramenta que pode ajudar é o 5W2H. Ela organiza o planejamento por meio de sete perguntas, deixando mais claro o que precisa ser feito.</p><p>No PRISMA, você encontra esse e outros métodos explicados visualmente, com exemplos para compreender melhor suas aplicações.</p></div>
+            <ImageSlot src={imageConfig.practicalApplication} label="Mapa real 5W2H — Plano de ação" className="practical-image benefits-practical-image" />
+          </div>
+        </section>
+
         <section className="modules section-pad section-light" id="modulos">
           <div className="section-heading"><span className="eyebrow">CONTEÚDO ORGANIZADO</span><h2>Uma biblioteca visual completa para estudar e consultar ferramentas de gestão.</h2><p>São 100 mapas organizados por assunto, reunindo conceitos, ferramentas e exemplos para você encontrar o que precisa sem depender de materiais espalhados.</p></div>
           <div className="module-grid">{modules.map((module) => <article className="module-card" key={module.title}><div className="module-top"><span>{module.number}</span><strong>{module.count}<small> MAPAS</small></strong></div><ImageSlot src={module.image} label={`Imagem do módulo ${module.number}`} className="module-image" /><h3>{module.title} — {module.count} mapas</h3><p>{module.description}</p></article>)}</div>
           <p className="module-total"><strong>100 mapas • 6 módulos</strong><span>Material digital para consulta e impressão</span></p>
-        </section>
-
-        <section className="commercial-benefits section-pad section-navy">
-          <div className="section-heading light"><span className="eyebrow eyebrow-light">MAIS PRATICIDADE</span><h2>Menos tempo procurando explicações. Mais praticidade para estudar e revisar.</h2><p>Em vez de consultar várias fontes toda vez que surgir uma dúvida, tenha os principais conceitos reunidos em materiais visuais e organizados.</p></div>
-          <div className="benefit-grid six-benefits">
-            {[
-              ['grid', 'Explicações visuais', 'Conceitos apresentados de maneira organizada, facilitando a identificação dos pontos principais.'],
-              ['book', 'Revisão prática', 'Consulte os mapas sempre que quiser retomar um assunto.'],
-              ['example', 'Exemplos de aplicação', 'Veja situações que ajudam a contextualizar como cada ferramenta é utilizada.'],
-              ['layers', 'Conteúdo organizado', 'Encontre os assuntos distribuídos em seis módulos.'],
-              ['file', 'Estude de onde estiver', 'Abra os PDFs em dispositivos compatíveis, como celular, tablet ou computador.'],
-              ['cards', 'Imprima quando quiser', 'Utilize os arquivos digitalmente ou imprima as páginas que forem úteis para seu estudo.'],
-            ].map(([icon, title, text], i) => <article className="benefit-card" key={title}><span className="benefit-index">0{i + 1}</span><Icon name={icon as IconName} /><h3>{title}</h3><p>{text}</p></article>)}
-          </div>
-        </section>
-
-        <section className="practical pain-comparison section-pad section-light" id="conteudo">
-          <div className="section-heading narrow"><span className="eyebrow">INFORMAÇÃO ORGANIZADA</span><h2>Você conhece as siglas, mas sabe diferenciar e aplicar cada ferramenta?</h2><p>SWOT, PDCA, GUT, 5W2H, Ishikawa... São muitos conceitos para aprender. E quando as explicações ficam espalhadas entre aulas, apostilas e pesquisas, revisar pode se tornar trabalhoso.</p></div>
-          <div className="practical-layout">
-            <div className="comparison">
-              <article className="comparison-card muted"><span className="comparison-label">ESTUDO COM INFORMAÇÕES DISPERSAS</span><ul><li><Icon name="x" /> Definições espalhadas em diferentes materiais.</li><li><Icon name="x" /> Dificuldade para encontrar exemplos.</li><li><Icon name="x" /> Mais tempo procurando o conteúdo.</li><li><Icon name="x" /> Revisão pouco organizada.</li></ul></article>
-              <article className="comparison-card positive"><span className="comparison-label">ESTUDO COM O PRISMA</span><ul><li><Icon name="check" /> Conteúdo reunido em mapas.</li><li><Icon name="check" /> Explicações e aplicações no mesmo material.</li><li><Icon name="check" /> Consulta organizada por assunto.</li><li><Icon name="check" /> PDFs disponíveis para revisão e impressão.</li></ul></article>
-            </div>
-            <ImageSlot src={imageConfig.practicalApplication} label="MAPA REAL DE PDCA OU 5W2H — INSERIR DEPOIS" className="practical-image" />
-          </div>
-          <p className="comparison-closing">Uma forma mais prática de reunir teoria, exemplos e consulta rápida em uma mesma biblioteca.</p>
         </section>
 
         <section className="bonuses section-pad section-navy">
@@ -322,7 +321,7 @@ function App() {
           <div className="section-heading"><span className="eyebrow">ESCOLHA SEU PACOTE</span><h2>Escolha como você quer acessar sua biblioteca de gestão.</h2><p>Pagamento único. Material digital em PDF.</p></div>
           <div className="offer-grid">
             <article className="offer-card basic"><ImageSlot src={imageConfig.basicPackage} label="IMAGEM DO PACOTE BÁSICO" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE BÁSICO</span><h3>PRISMA Essencial — 100 Mapas</h3><p className="plan-support">Para quem quer estudar e consultar os 100 mapas visuais de gestão.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.basic}</strong></div><ul><li><Icon name="check" /> 100 mapas visuais.</li><li><Icon name="check" /> 6 módulos completos.</li><li><Icon name="check" /> Explicações e exemplos práticos.</li><li><Icon name="check" /> PDF para consulta no celular e impressão.</li><li className="not-included"><Icon name="x" /> Não inclui os três bônus.</li></ul><button className="button button-outline" onClick={openBasicOffer}>QUERO OS 100 MAPAS</button></div></article>
-            <article className="offer-card premium"><span className="premium-ribbon">MAIS VENDIDO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><p className="premium-value-highlight">100 mapas visuais + 3 bônus exclusivos</p><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => checkout(siteConfig.checkouts.checkoutPremium, 'Premium')}>QUERO O PRISMA COMPLETO</button></div></article>
+            <article className="offer-card premium"><span className="premium-ribbon">PACOTE COMPLETO</span><ImageSlot src={imageConfig.premiumPackage} label="IMAGEM DO PACOTE PREMIUM" className="offer-image" /><div className="offer-body"><span className="plan-label">PACOTE PREMIUM</span><h3>PRISMA Completo — 100 Mapas + 3 Bônus</h3><p className="plan-support">Para quem deseja os mapas e mais três materiais complementares de estudo.</p><div className="price"><small>Pagamento único</small><strong>{siteConfig.prices.premium}</strong></div><p className="premium-value-highlight">100 mapas visuais + 3 bônus exclusivos</p><ul><li><Icon name="check" /> Os mesmos 100 mapas do Básico.</li><li><Icon name="check" /> 20 comparativos.</li><li><Icon name="check" /> 40 flashcards.</li><li><Icon name="check" /> Glossário de 100 termos.</li><li><Icon name="check" /> Todos os arquivos em formato digital.</li></ul><p className="premium-difference">Por R$10 a mais que o Básico, você acrescenta os três materiais complementares.</p><button className="button button-primary" onClick={() => checkout(siteConfig.checkouts.checkoutPremium, 'Premium')}>QUERO O PRISMA COMPLETO</button></div></article>
           </div>
           <p className="secure-note"><span aria-hidden="true">◇</span> Ao escolher uma opção, você será direcionado ao checkout correspondente da Lowify.</p>
         </section>
@@ -336,7 +335,7 @@ function App() {
         <section className="final-cta section-pad"><div><span className="eyebrow eyebrow-light">PRISMA — GESTÃO NA PRÁTICA</span><h2>Tenha os principais conceitos de gestão reunidos em uma biblioteca visual.</h2><p>São 100 mapas organizados em seis módulos, com explicações e exemplos para estudar, revisar e consultar sempre que precisar.</p><button className="button button-light" onClick={() => scrollTo('ofertas')}>ESCOLHER MEU PACOTE <span aria-hidden="true">↑</span></button></div></section>
       </main>
 
-      <footer><div className="footer-main"><div><a className="brand brand-light" href="#top"><span className="brand-prism">P</span><span><strong>PRISMA</strong><small>GESTÃO NA PRÁTICA</small></span></a><p>Material digital de estudo e consulta sobre ferramentas e conceitos de gestão.</p></div><div><h3>Informações</h3><button onClick={() => showNotice('Os Termos de Uso aguardam os dados jurídicos reais antes da publicação.')}>Termos de Uso</button><button onClick={() => showNotice('A Política de Privacidade aguarda os dados e ferramentas reais antes da publicação.')}>Política de Privacidade</button></div><div><h3>Suporte</h3><p>{siteConfig.contact.supportText}</p>{siteConfig.contact.email && <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a>}</div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} PRISMA — Gestão na Prática.</span><span>Produto digital em PDF.</span></div></footer>
+      <footer><div className="footer-main"><div><a className="brand brand-light" href="#top"><span className="brand-prism">P</span><span><strong>PRISMA</strong><small>GESTÃO NA PRÁTICA</small></span></a><p>Material digital de estudo e consulta sobre ferramentas e conceitos de gestão.</p></div><div><h3>Informações</h3><button onClick={() => showNotice('Os Termos de Uso aguardam os dados jurídicos reais antes da publicação.')}>Termos de Uso</button><button onClick={() => showNotice('A Política de Privacidade aguarda os dados e ferramentas reais antes da publicação.')}>Política de Privacidade</button></div><div><h3>Suporte</h3>{siteConfig.contact.email ? <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a> : <p>{siteConfig.contact.supportText}</p>}</div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} PRISMA — Gestão na Prática.</span><span>Produto digital em PDF.</span></div></footer>
 
       <Dialog open={previewIndex !== null} onClose={() => setPreviewIndex(null)} labelledBy="preview-title" className="preview-dialog">
         {previewIndex !== null && <><span className="dialog-overline">EXEMPLO DO CONTEÚDO</span><h2 id="preview-title">{slides[previewIndex].title}</h2><ImageSlot src={slides[previewIndex].image} label={`Prévia do mapa ${slides[previewIndex].title}`} className="preview-image" /><p>{slides[previewIndex].label}.</p></>}
