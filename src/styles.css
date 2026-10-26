@@ -171,6 +171,13 @@ p { line-height: 1.75; color: var(--muted); }
 .bonus-note { display: flex; align-items: center; justify-content: center; gap: 9px; color: #b9cbd6; font-size: 11px; margin: 31px 0 0; }
 .bonus-note .icon { color: var(--teal); width: 18px; }
 
+.testimonial-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 19px; }
+.testimonial-card { display: grid; grid-template-columns: 82px 1fr; gap: 20px; align-items: start; padding: 26px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 18px 44px rgba(8,35,63,.06); }
+.testimonial-card > img { width: 82px; height: 82px; object-fit: cover; border-radius: 50%; }
+.testimonial-card blockquote { margin: 0; }
+.testimonial-card blockquote p { margin: 0; color: #40576a; font-size: 12px; line-height: 1.7; }
+.testimonial-card blockquote footer { padding: 0; margin-top: 16px; background: none; color: var(--navy); font-size: 12px; font-weight: 800; }
+
 .offer-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
 .offer-card { border-radius: 18px; border: 1px solid var(--line); background: white; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(8,35,63,.07); }
 .offer-card.basic { align-self: start; }
@@ -274,6 +281,7 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   .benefits-practical { grid-template-columns: 1fr; }
   .carousel-shell { width: calc(100vw - 24px); }
   .module-grid { grid-template-columns: repeat(2, 1fr); }
+  .testimonial-grid { grid-template-columns: 1fr; max-width: 720px; }
   .practical-layout { grid-template-columns: 1fr; }.practical-image { min-height: 430px; }
   .faq-layout { grid-template-columns: 1fr; gap: 35px; }.faq-intro { position: static; max-width: 640px; }
   .footer-main { grid-template-columns: 1.2fr 1fr 1fr; gap: 30px; }
@@ -286,7 +294,7 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   .hero { padding-top: 30px; padding-bottom: 46px; }.hero > .eyebrow { margin-bottom: 11px; }.hero h1 { font-size: clamp(32px, 9.1vw, 38px); line-height: 1.07; margin-bottom: 8px; }.hero-visual { width: calc(100% + 8px); margin: 0 -4px 15px; }.hero-lead { font-size: 15px; margin-bottom: 0; }.hero-benefits { font-size: 12px; margin: 16px 0 20px; }.hero .button { width: 100%; }.microcopy { text-align: center; }
   .hero-slot { min-height: 0; padding: 0; }
   .section-heading { margin-bottom: 38px; }.section-heading h2, .solution-intro h2, .faq-intro h2, .final-cta h2 { font-size: 32px; }.section-heading p { font-size: 14px; }
-  .three-grid, .benefit-grid, .four-benefits, .module-grid, .bonus-grid, .offer-grid, .trust-grid, .pain-comparison-grid { grid-template-columns: 1fr; }
+  .three-grid, .benefit-grid, .four-benefits, .module-grid, .bonus-grid, .testimonial-grid, .offer-grid, .trust-grid, .pain-comparison-grid { grid-template-columns: 1fr; }
   .pain-card { padding: 27px 24px; }.pain-card h3 { margin-top: 28px; }
   .solution { gap: 48px; }.benefit-card { min-height: 160px; }.benefit-card .icon { margin-top: 20px; }
   .demo { padding-top: 50px; padding-bottom: 50px; }.demo .section-heading { margin-bottom: 21px; }.carousel-instruction { margin-top: 9px; }
@@ -296,6 +304,8 @@ footer { background: #061b30; color: white; padding: 70px max(24px, calc((100vw 
   .benefits-practical { margin-top: 24px; padding: 18px; gap: 20px; }
   .benefits-practical-copy h3 { font-size: 26px; }
   .bonus-note { align-items: flex-start; text-align: left; }
+  .testimonial-card { grid-template-columns: 68px 1fr; gap: 16px; padding: 22px; }
+  .testimonial-card > img { width: 68px; height: 68px; }
   .offer-card.premium { transform: none; box-shadow: 0 25px 62px rgba(23,105,224,.22), 0 0 0 5px rgba(23,105,224,.055); }.offer-body { padding: 28px 23px; min-height: 0; }.price strong { font-size: 39px; }.plan-support { min-height: 0; }
   .accordion summary { font-size: 13px; }.accordion details p { margin-right: 15px; }
   .footer-main { grid-template-columns: 1fr; gap: 32px; }.footer-bottom { flex-direction: column; gap: 7px; }
