@@ -73,6 +73,30 @@ const slides = [
   { title: 'Reunião 1:1', label: 'Escuta, desenvolvimento e acordos', image: imageConfig.carousel.oneOnOne, tone: 'navy' },
 ]
 
+const testimonials = [
+  {
+    name: 'Salazar',
+    text: 'Trabalho na área administrativa e achei o material muito útil. Tem várias ferramentas que aparecem no dia a dia e os mapas ajudam a entender melhor para que cada uma serve. Recomendo!',
+    image: '/images/testimonial-salazar.png',
+    width: 131,
+    height: 171,
+  },
+  {
+    name: 'Aline',
+    text: 'Material muito bom, tudo bem organizado e explicado de forma simples. Gostei principalmente porque consigo encontrar os assuntos sem ficar procurando em vários lugares. Vale muito a pena!',
+    image: '/images/testimonial-aline.png',
+    width: 133,
+    height: 174,
+  },
+  {
+    name: 'Otavio',
+    text: 'Gostei muito do material! Tem várias ferramentas de gestão que eu já tinha ouvido falar, mas nunca entendia direito. Com os mapas ficou bem mais fácil de compreender. Recomendo demais!',
+    image: '/images/testimonial-otavio.png',
+    width: 130,
+    height: 175,
+  },
+]
+
 const faqs = [
   ['Para quem o PRISMA é indicado?', 'Para estudantes, profissionais e pessoas que desejam compreender e revisar ferramentas de gestão. É um material complementar, não um curso ou certificação.'],
   ['Qual é a diferença entre Essencial e Completo?', 'O Essencial reúne os 100 mapas em 6 módulos. O Completo inclui também 20 comparativos, 40 flashcards e um glossário de 100 termos.'],
@@ -315,6 +339,13 @@ function App() {
             ].map(([icon, overline, title, text, image]) => <article className="bonus-card" key={title}><div className={`bonus-visual ${image ? 'has-image' : ''}`}>{image ? <ResponsiveImage src={image} alt={`Imagem do ${title}`} sizes="(max-width: 720px) calc(100vw - 36px), 360px" /> : <><Icon name={icon as IconName} /><span>IMAGEM DO {overline}</span></>}</div><span className="bonus-overline">{overline}</span><h3>{title}</h3><p>{text}</p></article>)}
           </div>
           <p className="bonus-note"><Icon name="check" /> Os três bônus fazem parte do Premium e da opção promocional do pacote completo.</p>
+        </section>
+
+        <section className="testimonials section-pad section-light" aria-labelledby="testimonials-title">
+          <div className="section-heading"><span className="eyebrow">DEPOIMENTOS</span><h2 id="testimonials-title">O que dizem sobre o PRISMA.</h2></div>
+          <div className="testimonial-grid">
+            {testimonials.map((testimonial) => <article className="testimonial-card" key={testimonial.name}><img src={testimonial.image} alt={`Foto de ${testimonial.name}`} width={testimonial.width} height={testimonial.height} loading="lazy" decoding="async" /><blockquote><p>“{testimonial.text}”</p><footer>{testimonial.name}</footer></blockquote></article>)}
+          </div>
         </section>
 
         <section className="offers section-pad" id="ofertas">
