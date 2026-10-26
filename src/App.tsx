@@ -282,7 +282,7 @@ function App() {
       <main id="top">
         <section className="hero section-pad">
           <span className="eyebrow"><span></span> BIBLIOTECA VISUAL DE GESTÃO</span>
-          <h1>Estuda ou já se formou em Administração, mas ainda tem dificuldade para entender tantas <em>ferramentas <span className="no-break">de gestão?</span></em></h1>
+          <h1>Estuda ou é formado em Administração e ainda se confunde com as <em>ferramentas <span className="no-break">de gestão?</span></em></h1>
           <div className="hero-visual"><div className="hero-glow"></div><ImageSlot src={imageConfig.hero} label="Apresentação visual do PRISMA — Gestão na Prática" className="hero-slot" priority /></div>
           <p className="hero-lead">Conheça o PRISMA: 100 mapas visuais organizados em 6 módulos, com explicações simples e exemplos práticos para ajudar você a compreender, diferenciar e revisar as principais ferramentas de gestão, seja na faculdade ou no trabalho.</p>
           <ul className="hero-benefits">
